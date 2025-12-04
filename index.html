@@ -1,0 +1,433 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <title>Suivi Sport & Alimentation</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <!-- Couleur de thème pour la barre du haut -->
+  <meta name="theme-color" content="#2563eb">
+
+  <!-- Manifest PWA -->
+  <link rel="manifest" href="manifest.webmanifest">
+
+  <!-- Icône de base (fallback) -->
+  <link rel="icon" type="image/png" href="icons/icon-192.png">
+
+  <style>
+    :root { font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; }
+    body { margin: 0; padding: 0; background: #f3f4f6; color: #111827; }
+    .app { max-width: 960px; margin: 0 auto; padding: 1.5rem; }
+    header { display: flex; flex-direction: column; gap: 0.5rem; margin-bottom: 1.5rem; }
+    h1 { margin: 0; font-size: 1.6rem; }
+    .subtitle { font-size: 0.9rem; color: #6b7280; }
+    .card { background: #ffffff; border-radius: 0.75rem; padding: 1rem 1.25rem; margin-bottom: 1rem;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.03); }
+    .card-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.75rem; }
+    .card-title { font-weight: 600; font-size: 1rem; display: flex; align-items: center; gap: 0.4rem; }
+    .pill { display: inline-flex; align-items: center; padding: 0.15rem 0.5rem; border-radius: 999px;
+            font-size: 0.7rem; background: #e5e7eb; color: #374151; }
+    label { font-size: 0.8rem; color: #4b5563; display: block; margin-bottom: 0.25rem; }
+    input, select, textarea {
+      width: 100%; padding: 0.35rem 0.5rem; border-radius: 0.5rem;
+      border: 1px solid #d1d5db; font-size: 0.85rem; box-sizing: border-box;
+    }
+    textarea { resize: vertical; min-height: 50px; }
+    input:focus, select:focus, textarea:focus {
+      outline: none; border-color: #2563eb; box-shadow: 0 0 0 1px rgba(37,99,235,0.2);
+    }
+    .row { display: grid; grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+           gap: 0.5rem; margin-bottom: 0.5rem; }
+    .btn {
+      display: inline-flex; align-items: center; justify-content: center;
+      padding: 0.4rem 0.9rem; border-radius: 999px; border: none;
+      font-size: 0.8rem; cursor: pointer; gap: 0.25rem; white-space: nowrap;
+    }
+    .btn-primary { background: #2563eb; color: white; }
+    .btn-danger { background: #ef4444; color: white; }
+    .items-list { margin-top: 0.5rem; border-top: 1px solid #e5e7eb; padding-top: 0.5rem; }
+    .item {
+      display: grid; grid-template-columns: 1fr auto; gap: 0.25rem 0.5rem;
+      padding: 0.4rem 0; border-bottom: 1px dashed #e5e7eb; font-size: 0.8rem;
+    }
+    .item:last-child { border-bottom: none; }
+    .item-main { display: flex; flex-direction: column; gap: 0.15rem; }
+    .item-title { font-weight: 600; }
+    .item-meta { font-size: 0.75rem; color: #6b7280; }
+    .item-notes { font-size: 0.75rem; color: #4b5563; }
+    .chip {
+      display: inline-flex; align-items: center; padding: 0.05rem 0.4rem;
+      border-radius: 999px; background: #eff6ff; color: #1d4ed8; font-size: 0.7rem;
+      margin-left: 0.25rem;
+    }
+    .top-bar {
+      display: flex; flex-wrap: wrap; align-items: center; gap: 0.5rem;
+    }
+    .top-bar-group { display: flex; align-items: center; gap: 0.5rem; font-size: 0.85rem; }
+    .top-bar input[type="date"] { width: auto; }
+    .tagline { font-size: 0.8rem; color: #6b7280; }
+    @media (max-width: 600px) {
+      .app { padding: 1rem; }
+      .top-bar { flex-direction: column; align-items: flex-start; }
+    }
+  </style>
+</head>
+<body>
+  <div class="app">
+    <header>
+      <h1>Suivi Sport & Alimentation</h1>
+      <div class="top-bar">
+        <div class="top-bar-group">
+          <span>📅 Jour :</span>
+          <input type="date" id="dateInput">
+        </div>
+        <div class="top-bar-group">
+          <span id="daySummary" class="tagline"></span>
+        </div>
+      </div>
+      <div class="subtitle">
+        Note tes séances (exercices, séries, répétitions, charges) et tes repas jour par jour.
+      </div>
+    </header>
+
+    <!-- Entraînement -->
+    <section class="card">
+      <div class="card-header">
+        <div class="card-title">
+          🏋️ Entraînement du jour
+          <span class="pill" id="workoutCount">0 exercice</span>
+        </div>
+      </div>
+      <form id="workoutForm">
+        <div class="row">
+          <div>
+            <label for="wName">Exercice</label>
+            <input id="wName" type="text" placeholder="Presse à cuisses, Rowing, Vélo...">
+          </div>
+          <div>
+            <label for="wType">Type</label>
+            <select id="wType">
+              <option value="muscu">Musculation</option>
+              <option value="cardio">Cardio</option>
+              <option value="fullbody">Full body</option>
+              <option value="haut">Haut du corps</option>
+              <option value="bas">Bas du corps</option>
+              <option value="autre">Autre</option>
+            </select>
+          </div>
+        </div>
+        <div class="row">
+          <div>
+            <label for="wSets">Séries</label>
+            <input id="wSets" type="number" min="1" placeholder="3">
+          </div>
+          <div>
+            <label for="wReps">Répétitions</label>
+            <input id="wReps" type="number" min="1" placeholder="10">
+          </div>
+          <div>
+            <label for="wWeight">Charge (kg)</label>
+            <input id="wWeight" type="number" step="0.5" placeholder="40">
+          </div>
+        </div>
+        <div class="row">
+          <div style="grid-column: 1 / -1;">
+            <label for="wNotes">Notes (optionnel)</label>
+            <textarea id="wNotes" placeholder="RPE, sensations, douleur éventuelle..."></textarea>
+          </div>
+        </div>
+        <button type="submit" class="btn btn-primary">+ Ajouter l'exercice</button>
+      </form>
+      <div id="workoutList" class="items-list"></div>
+    </section>
+
+    <!-- Alimentation -->
+    <section class="card">
+      <div class="card-header">
+        <div class="card-title">
+          🍽️ Alimentation du jour
+          <span class="pill" id="mealCount">0 repas</span>
+        </div>
+      </div>
+      <form id="mealForm">
+        <div class="row">
+          <div>
+            <label for="mType">Moment</label>
+            <select id="mType">
+              <option value="Petit-déjeuner">Petit-déjeuner</option>
+              <option value="Déjeuner">Déjeuner</option>
+              <option value="Dîner">Dîner</option>
+              <option value="Collation">Collation</option>
+            </select>
+          </div>
+          <div>
+            <label for="mCalories">Calories (optionnel)</label>
+            <input id="mCalories" type="number" min="0" placeholder="ex : 600">
+          </div>
+        </div>
+        <div class="row">
+          <div style="grid-column: 1 / -1;">
+            <label for="mDesc">Description du repas</label>
+            <textarea id="mDesc" placeholder="Soupe de légumes, banane, clémentine, pruneaux..."></textarea>
+          </div>
+        </div>
+        <button type="submit" class="btn btn-primary">+ Ajouter le repas</button>
+      </form>
+      <div id="mealList" class="items-list"></div>
+    </section>
+
+    <!-- Résumé -->
+    <section class="card">
+      <div class="card-header">
+        <div class="card-title">📊 Résumé de la journée</div>
+      </div>
+      <div id="dayRecap" class="tagline">
+        Aucune donnée pour le moment.
+      </div>
+    </section>
+  </div>
+
+  <script>
+    const STORAGE_KEY = "suiviSportAlim_v1";
+
+    function loadData() {
+      try {
+        const raw = localStorage.getItem(STORAGE_KEY);
+        return raw ? JSON.parse(raw) : {};
+      } catch (e) {
+        console.error("Erreur de lecture du stockage local", e);
+        return {};
+      }
+    }
+
+    function saveData(data) {
+      try {
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+      } catch (e) {
+        console.error("Erreur d'écriture du stockage local", e);
+      }
+    }
+
+    function formatDateKey(dateStr) { return dateStr; }
+
+    function updateSummaryForDay(dayData) {
+      const workouts = dayData?.workouts || [];
+      const meals = dayData?.meals || [];
+      const totalExercises = workouts.length;
+      const totalMeals = meals.length;
+      const totalCalories = meals.reduce((sum, m) => {
+        const c = parseFloat(m.calories);
+        return sum + (isNaN(c) ? 0 : c);
+      }, 0);
+      const recap = document.getElementById("dayRecap");
+      const daySummary = document.getElementById("daySummary");
+
+      if (!totalExercises && !totalMeals) {
+        recap.textContent = "Aucune séance ni repas enregistrés pour ce jour.";
+        daySummary.textContent = "";
+        return;
+      }
+
+      let parts = [];
+      if (totalExercises) parts.push(`${totalExercises} exercice(s)`);
+      if (totalMeals) parts.push(`${totalMeals} repas`);
+      if (totalCalories) parts.push(`${totalCalories} kcal approx.`);
+
+      recap.textContent = parts.join(" • ");
+      daySummary.textContent = parts.join(" • ");
+    }
+
+    function renderDay(dateStr) {
+      const data = loadData();
+      const key = formatDateKey(dateStr);
+      const dayData = data[key] || { workouts: [], meals: [] };
+
+      const workoutList = document.getElementById("workoutList");
+      const mealList = document.getElementById("mealList");
+      const workoutCount = document.getElementById("workoutCount");
+      const mealCount = document.getElementById("mealCount");
+
+      workoutList.innerHTML = "";
+      mealList.innerHTML = "";
+
+      // Workouts
+      workoutCount.textContent = `${dayData.workouts.length} exercice${dayData.workouts.length > 1 ? "s" : ""}`;
+      dayData.workouts.forEach((w, index) => {
+        const div = document.createElement("div");
+        div.className = "item";
+
+        const main = document.createElement("div");
+        main.className = "item-main";
+
+        const title = document.createElement("div");
+        title.className = "item-title";
+        title.textContent = w.name || "Exercice sans nom";
+        if (w.type) {
+          const chip = document.createElement("span");
+          chip.className = "chip";
+          chip.textContent = w.type;
+          title.appendChild(chip);
+        }
+
+        const meta = document.createElement("div");
+        meta.className = "item-meta";
+        let metaParts = [];
+        if (w.sets) metaParts.push(`${w.sets} séries`);
+        if (w.reps) metaParts.push(`${w.reps} reps`);
+        if (w.weight) metaParts.push(`${w.weight} kg`);
+        meta.textContent = metaParts.join(" • ") || "Détails non précisés";
+
+        main.appendChild(title);
+        main.appendChild(meta);
+
+        if (w.notes) {
+          const notes = document.createElement("div");
+          notes.className = "item-notes";
+          notes.textContent = w.notes;
+          main.appendChild(notes);
+        }
+
+        const actions = document.createElement("div");
+        const delBtn = document.createElement("button");
+        delBtn.className = "btn btn-danger";
+        delBtn.textContent = "Supprimer";
+        delBtn.addEventListener("click", () => {
+          const newData = loadData();
+          const d = newData[key];
+          if (!d) return;
+          d.workouts.splice(index, 1);
+          newData[key] = d;
+          saveData(newData);
+          renderDay(dateStr);
+        });
+        actions.appendChild(delBtn);
+
+        div.appendChild(main);
+        div.appendChild(actions);
+        workoutList.appendChild(div);
+      });
+
+      // Meals
+      mealCount.textContent = `${dayData.meals.length} repas`;
+      dayData.meals.forEach((m, index) => {
+        const div = document.createElement("div");
+        div.className = "item";
+
+        const main = document.createElement("div");
+        main.className = "item-main";
+
+        const title = document.createElement("div");
+        title.className = "item-title";
+        title.textContent = m.type || "Repas";
+
+        const meta = document.createElement("div");
+        meta.className = "item-meta";
+        let metaParts = [];
+        if (m.calories) metaParts.push(`${m.calories} kcal`);
+        meta.textContent = metaParts.join(" • ") || "";
+
+        main.appendChild(title);
+        if (meta.textContent) main.appendChild(meta);
+
+        if (m.desc) {
+          const notes = document.createElement("div");
+          notes.className = "item-notes";
+          notes.textContent = m.desc;
+          main.appendChild(notes);
+        }
+
+        const actions = document.createElement("div");
+        const delBtn = document.createElement("button");
+        delBtn.className = "btn btn-danger";
+        delBtn.textContent = "Supprimer";
+        delBtn.addEventListener("click", () => {
+          const newData = loadData();
+          const d = newData[key];
+          if (!d) return;
+          d.meals.splice(index, 1);
+          newData[key] = d;
+          saveData(newData);
+          renderDay(dateStr);
+        });
+        actions.appendChild(delBtn);
+
+        div.appendChild(main);
+        div.appendChild(actions);
+        mealList.appendChild(div);
+      });
+
+      updateSummaryForDay(dayData);
+    }
+
+    document.addEventListener("DOMContentLoaded", () => {
+      const dateInput = document.getElementById("dateInput");
+      const today = new Date().toISOString().slice(0, 10);
+      dateInput.value = today;
+
+      dateInput.addEventListener("change", () => {
+        renderDay(dateInput.value);
+      });
+
+      const workoutForm = document.getElementById("workoutForm");
+      workoutForm.addEventListener("submit", (e) => {
+        e.preventDefault();
+        const dateStr = dateInput.value;
+        const data = loadData();
+        const key = formatDateKey(dateStr);
+        if (!data[key]) data[key] = { workouts: [], meals: [] };
+
+        const w = {
+          name: document.getElementById("wName").value.trim(),
+          type: document.getElementById("wType").value,
+          sets: document.getElementById("wSets").value,
+          reps: document.getElementById("wReps").value,
+          weight: document.getElementById("wWeight").value,
+          notes: document.getElementById("wNotes").value.trim()
+        };
+
+        if (!w.name && !w.sets && !w.reps && !w.weight && !w.notes) return;
+
+        data[key].workouts.push(w);
+        saveData(data);
+
+        workoutForm.reset();
+        document.getElementById("wType").value = "muscu";
+        renderDay(dateStr);
+      });
+
+      const mealForm = document.getElementById("mealForm");
+      mealForm.addEventListener("submit", (e) => {
+        e.preventDefault();
+        const dateStr = dateInput.value;
+        const data = loadData();
+        const key = formatDateKey(dateStr);
+        if (!data[key]) data[key] = { workouts: [], meals: [] };
+
+        const m = {
+          type: document.getElementById("mType").value,
+          calories: document.getElementById("mCalories").value,
+          desc: document.getElementById("mDesc").value.trim()
+        };
+
+        if (!m.desc && !m.calories) return;
+
+        data[key].meals.push(m);
+        saveData(data);
+
+        mealForm.reset();
+        document.getElementById("mType").value = "Petit-déjeuner";
+        renderDay(dateStr);
+      });
+
+      // Enregistrement du service worker pour PWA
+      if ("serviceWorker" in navigator) {
+        navigator.serviceWorker.register("sw.js").catch((err) => {
+          console.error("Service worker non enregistré", err);
+        });
+      }
+
+      renderDay(today);
+    });
+  </script>
+</body>
+</html>
