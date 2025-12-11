@@ -11,6 +11,10 @@ body {
   color: #f9fafb;
 }
 
+.hidden {
+  display: none !important;
+}
+
 .app-container {
   min-height: 100vh;
   display: flex;
@@ -34,6 +38,15 @@ body {
   color: #9ca3af;
 }
 
+/* Bandeau de rappel */
+.reminder-banner {
+  padding: 0.5rem 1rem;
+  font-size: 0.85rem;
+  background: #f59e0b;
+  color: #111827;
+}
+
+/* Main */
 main {
   flex: 1;
   padding: 0.75rem;
@@ -87,14 +100,16 @@ h2 {
 /* Inputs & boutons */
 input,
 textarea,
-button {
+button,
+select {
   font-family: inherit;
   font-size: 0.95rem;
 }
 
 input[type="number"],
 input[type="date"],
-textarea {
+textarea,
+select {
   width: 100%;
   padding: 0.45rem 0.5rem;
   border-radius: 0.5rem;
@@ -170,6 +185,11 @@ button:disabled {
   background: #22c55e;
   color: #022c22;
   border-color: #22c55e;
+}
+
+.week-duplicate-btn {
+  margin-top: 0.75rem;
+  width: 100%;
 }
 
 /* Program / Workout exercices */
@@ -284,4 +304,67 @@ button:disabled {
     max-width: 520px;
     border-radius: 1rem;
   }
+}
+
+/* -------- THÈME CLAIR -------- */
+
+body.light-theme {
+  background: #f3f4f6;
+  color: #111827;
+}
+
+body.light-theme .app-header {
+  background: #e5e7eb;
+  border-bottom: 1px solid #d1d5db;
+}
+
+body.light-theme .app-header p {
+  color: #6b7280;
+}
+
+body.light-theme .card {
+  background: #ffffff;
+  border-color: #e5e7eb;
+}
+
+body.light-theme input[type="number"],
+body.light-theme input[type="date"],
+body.light-theme textarea,
+body.light-theme select {
+  background: #ffffff;
+  border-color: #d1d5db;
+  color: #111827;
+}
+
+body.light-theme .secondary-btn {
+  background: #f3f4f6;
+  color: #111827;
+  border-color: #d1d5db;
+}
+
+body.light-theme .small-info {
+  color: #6b7280;
+}
+
+body.light-theme .bottom-nav {
+  background: #e5e7eb;
+  border-color: #d1d5db;
+}
+
+body.light-theme .nav-btn {
+  color: #6b7280;
+}
+
+body.light-theme .nav-btn.active {
+  color: #16a34a;
+  border-bottom-color: #16a34a;
+}
+
+body.light-theme .modal {
+  background: rgba(15, 23, 42, 0.4);
+}
+
+body.light-theme .modal-content {
+  background: #ffffff;
+  border-color: #e5e7eb;
 }
