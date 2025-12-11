@@ -2,7 +2,7 @@
 <html lang="fr">
 <head>
   <meta charset="UTF-8" />
-  <title>Suivi Sport V3</title>
+  <title>Suivi Sport V3.2</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <link rel="stylesheet" href="style.css" />
   <!-- Chart.js pour les graphiques -->
@@ -67,7 +67,14 @@
           <h3>Calories du jour</h3>
           <div class="row">
             <input type="number" id="today-calories-input" step="1" placeholder="Calories (kcal)" />
-            <button id="save-today-calories-btn">Enregistrer</button>
+          </div>
+          <div class="row">
+            <button id="auto-calc-calories-btn" class="secondary-btn">
+              Calculer à partir des repas
+            </button>
+            <button id="save-today-calories-btn" class="primary-btn">
+              Enregistrer
+            </button>
           </div>
           <p id="today-calories-info" class="small-info"></p>
         </section>
@@ -237,6 +244,22 @@
         <button id="add-workout-exercise-btn" class="secondary-btn">Ajouter un exercice</button>
         <button id="save-workout-btn" class="primary-btn">Enregistrer la séance</button>
         <button id="close-workout-modal-btn" class="link-btn">Fermer</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal nouvel aliment (calories inconnues) -->
+  <div id="food-modal" class="modal hidden">
+    <div class="modal-content">
+      <h3>Nouvel aliment</h3>
+      <p id="food-modal-question"></p>
+      <div class="row">
+        <label for="food-calories-input">Calories pour 1 portion (kcal)</label>
+        <input type="number" id="food-calories-input" />
+      </div>
+      <div class="modal-actions">
+        <button id="food-save-btn" class="primary-btn">Enregistrer</button>
+        <button id="food-cancel-btn" class="link-btn">Annuler</button>
       </div>
     </div>
   </div>
