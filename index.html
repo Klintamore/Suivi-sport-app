@@ -2,7 +2,7 @@
 <html lang="fr">
 <head>
   <meta charset="UTF-8" />
-  <title>Suivi Sport V2</title>
+  <title>Suivi Sport V3</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <link rel="stylesheet" href="style.css" />
   <!-- Chart.js pour les graphiques -->
@@ -14,6 +14,9 @@
       <h1>Suivi Sport</h1>
       <p id="current-date-label"></p>
     </header>
+
+    <!-- Bandeau de rappels -->
+    <div id="reminder-banner" class="reminder-banner hidden"></div>
 
     <main>
       <!-- Onglet Aujourd'hui -->
@@ -59,6 +62,16 @@
           </div>
         </section>
 
+        <!-- Calories du jour -->
+        <section class="card">
+          <h3>Calories du jour</h3>
+          <div class="row">
+            <input type="number" id="today-calories-input" step="1" placeholder="Calories (kcal)" />
+            <button id="save-today-calories-btn">Enregistrer</button>
+          </div>
+          <p id="today-calories-info" class="small-info"></p>
+        </section>
+
         <!-- Séance du jour -->
         <section class="card">
           <h3>Séance du jour</h3>
@@ -75,6 +88,9 @@
         <section class="card">
           <h3>Semaine</h3>
           <div id="week-days-container" class="week-days"></div>
+          <button id="duplicate-week-btn" class="secondary-btn week-duplicate-btn">
+            Dupliquer cette semaine vers la suivante
+          </button>
         </section>
 
         <section class="card">
@@ -83,6 +99,10 @@
             <input type="date" id="program-date-picker" />
             <button id="duplicate-day-btn" class="secondary-btn">Dupliquer un jour</button>
           </div>
+
+          <button id="suggest-exercises-btn" class="secondary-btn" style="margin-bottom:0.5rem;">
+            Idées d'exercices
+          </button>
 
           <div id="program-exercises-container"></div>
           <button id="add-program-exercise-btn">Ajouter un exercice</button>
@@ -110,6 +130,7 @@
             <button id="set-this-week-btn" class="secondary-btn">Cette semaine</button>
             <button id="set-this-month-btn" class="secondary-btn">Ce mois</button>
             <button id="apply-history-filter-btn" class="primary-btn">Appliquer</button>
+            <button id="print-history-btn" class="secondary-btn">Exporter en PDF</button>
           </div>
         </section>
 
@@ -124,6 +145,16 @@
         </section>
 
         <section class="card">
+          <h3>Évolution de l'IMC</h3>
+          <canvas id="bmi-chart" height="200"></canvas>
+        </section>
+
+        <section class="card">
+          <h3>Évolution des calories</h3>
+          <canvas id="calories-chart" height="200"></canvas>
+        </section>
+
+        <section class="card">
           <h3>Volume d'entraînement</h3>
           <canvas id="volume-chart" height="200"></canvas>
         </section>
@@ -131,6 +162,11 @@
         <section class="card">
           <h3>Séances de la période</h3>
           <div id="history-workouts-list"></div>
+        </section>
+
+        <section class="card">
+          <h3>Mes records</h3>
+          <div id="records-list"></div>
         </section>
       </section>
 
@@ -150,6 +186,29 @@
           </div>
           <button id="save-profile-btn" class="primary-btn">Enregistrer le profil</button>
           <p id="profile-info" class="small-info"></p>
+        </section>
+
+        <section class="card">
+          <h3>Affichage</h3>
+          <div class="row">
+            <label for="theme-select">Thème</label>
+            <select id="theme-select">
+              <option value="dark">Sombre</option>
+              <option value="light">Clair</option>
+            </select>
+          </div>
+        </section>
+
+        <section class="card">
+          <h3>Rappels</h3>
+          <div class="row">
+            <label for="reminders-toggle">Activer les rappels internes</label>
+            <input type="checkbox" id="reminders-toggle" />
+          </div>
+          <p class="small-info">
+            Les rappels apparaissent en haut de l'écran si tu n'as pas saisi ton poids
+            ou si une séance est prévue aujourd'hui sans séance enregistrée.
+          </p>
         </section>
 
         <section class="card">
