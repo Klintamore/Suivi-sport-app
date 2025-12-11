@@ -254,7 +254,7 @@ button:disabled {
   border-bottom: 2px solid #22c55e;
 }
 
-/* Modal séance */
+/* Modal séance + modal aliments */
 .modal {
   position: fixed;
   inset: 0;
