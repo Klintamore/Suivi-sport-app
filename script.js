@@ -925,3 +925,604 @@ function duplicateWeek() {
   buildWeekView();
   alert("Semaine dupliquée vers la suivante.");
 }
+
+function showExerciseSuggestions() {
+  var msg =
+    "Idées d'exercices :\n\n" +
+    "Pectoraux : développé couché, développé incliné, écartés haltères.\n" +
+    "Dos : tirage vertical, rowing barre, rowing haltères.\n" +
+    "Jambes : squat, presse à cuisses, fentes.\n" +
+    "Épaules : développé militaire, élévations latérales.\n" +
+    "Bras : curl biceps, extension triceps à la poulie.\n" +
+    "Abdos : crunch, gainage, relevé de jambes.";
+  alert(msg);
+}
+
+/* ---------- Modal séance du jour (Workout) ---------- */
+
+function initWorkoutModal() {
+  var closeBtn = document.getElementById("close-workout-modal-btn");
+  closeBtn.addEventListener("click", function () {
+    closeWorkoutModal();
+  });
+
+  document
+    .getElementById("add-workout-exercise-btn")
+    .addEventListener("click", function () {
+      addWorkoutExerciseRow();
+    });
+
+  document.getElementById("save-workout-btn").addEventListener("click", function () {
+    saveWorkoutLog();
+  });
+}
+
+var currentWorkoutDate = getTodayDateString();
+
+function openWorkoutModal(dateStr, freeMode) {
+  currentWorkoutDate = dateStr;
+  document.getElementById("workout-modal-date").textContent =
+    formatDateHuman(currentWorkoutDate);
+
+  var container = document.getElementById("workout-exercises-container");
+  container.innerHTML = "";
+
+  var workouts = loadArray(STORAGE_KEYS.workouts);
+  var existing = workouts.find(function (w) {
+    return w.date === currentWorkoutDate;
+  });
+  var program = loadArray(STORAGE_KEYS.program);
+  var dayProgram = program.find(function (p) {
+    return p.date === currentWorkoutDate;
+  });
+
+  if (existing && existing.exercises.length > 0) {
+    existing.exercises.forEach(function (ex) {
+      addWorkoutExerciseRow(ex);
+    });
+  } else if (!freeMode && dayProgram && dayProgram.exercises.length > 0) {
+    dayProgram.exercises.forEach(function (ex) {
+      addWorkoutExerciseRow({
+        name: ex.name,
+        setsDone: ex.targetSets,
+        repsPerSet: ex.targetReps ? String(ex.targetReps) : "",
+        weightUsed: ex.targetWeight,
+        restSeconds: 0,
+        notes: ""
+      });
+    });
+  } else {
+    addWorkoutExerciseRow();
+  }
+
+  document.getElementById("workout-modal").classList.remove("hidden");
+}
+
+function closeWorkoutModal() {
+  document.getElementById("workout-modal").classList.add("hidden");
+}
+
+function addWorkoutExerciseRow(ex) {
+  var container = document.getElementById("workout-exercises-container");
+  var row = document.createElement("div");
+  row.className = "exercise-row";
+
+  var header = document.createElement("div");
+  header.className = "exercise-row-header";
+
+  var title = document.createElement("strong");
+  title.textContent = (ex && ex.name) || "Exercice";
+
+  var deleteBtn = document.createElement("button");
+  deleteBtn.className = "link-btn";
+  deleteBtn.textContent = "Supprimer";
+  deleteBtn.addEventListener("click", function () {
+    row.remove();
+  });
+
+  header.appendChild(title);
+  header.appendChild(deleteBtn);
+
+  var nameInput = document.createElement("input");
+  nameInput.type = "text";
+  nameInput.placeholder = "Nom de l'exercice";
+  nameInput.value = (ex && ex.name) || "";
+  nameInput.addEventListener("input", function () {
+    title.textContent = nameInput.value || "Exercice";
+  });
+
+  var setsInput = document.createElement("input");
+  setsInput.type = "number";
+  setsInput.placeholder = "Séries effectuées";
+  setsInput.value = (ex && ex.setsDone) || "";
+
+  var repsInput = document.createElement("input");
+  repsInput.type = "text";
+  repsInput.placeholder = "Répétitions par série (ex : 10/10/8)";
+  repsInput.value = (ex && ex.repsPerSet) || "";
+
+  var weightInput = document.createElement("input");
+  weightInput.type = "number";
+  weightInput.placeholder = "Poids utilisé (kg)";
+  weightInput.step = "0.5";
+  weightInput.value = (ex && ex.weightUsed) || "";
+
+  var restInput = document.createElement("input");
+  restInput.type = "number";
+  restInput.placeholder = "Repos entre séries (sec)";
+  restInput.value = (ex && ex.restSeconds) || "";
+
+  var notesInput = document.createElement("textarea");
+  notesInput.rows = 2;
+  notesInput.placeholder = "Notes (facultatif)";
+  notesInput.value = (ex && ex.notes) || "";
+
+  row.appendChild(header);
+  row.appendChild(nameInput);
+  row.appendChild(setsInput);
+  row.appendChild(repsInput);
+  row.appendChild(weightInput);
+  row.appendChild(restInput);
+  row.appendChild(notesInput);
+
+  container.appendChild(row);
+}
+
+function saveWorkoutLog() {
+  var rows = document.querySelectorAll("#workout-exercises-container .exercise-row");
+  var exercises = [];
+
+  rows.forEach(function (row) {
+    var inputs = row.querySelectorAll("input, textarea");
+    var nameI = inputs[0];
+    var setsI = inputs[1];
+    var repsI = inputs[2];
+    var weightI = inputs[3];
+    var restI = inputs[4];
+    var notesI = inputs[5];
+
+    var name = nameI.value.trim();
+    if (!name) return;
+    exercises.push({
+      name: name,
+      setsDone: parseInt(setsI.value, 10) || 0,
+      repsPerSet: repsI.value.trim(),
+      weightUsed: parseFloat(weightI.value) || 0,
+      restSeconds: parseInt(restI.value, 10) || 0,
+      notes: notesI.value.trim()
+    });
+  });
+
+  var workouts = loadArray(STORAGE_KEYS.workouts);
+  var idx = workouts.findIndex(function (w) {
+    return w.date === currentWorkoutDate;
+  });
+  var entry = { date: currentWorkoutDate, exercises: exercises };
+
+  if (idx >= 0) workouts[idx] = entry;
+  else workouts.push(entry);
+
+  saveArray(STORAGE_KEYS.workouts, workouts);
+  closeWorkoutModal();
+  if (currentWorkoutDate === getTodayDateString()) {
+    updateReminderBanner();
+  }
+}
+
+/* ---------- Onglet Historique & Stats ---------- */
+
+function initHistoryTab() {
+  var today = getTodayDateString();
+  document.getElementById("history-start-date").value = today;
+  document.getElementById("history-end-date").value = today;
+
+  document
+    .getElementById("set-this-week-btn")
+    .addEventListener("click", function () {
+      setHistoryThisWeek();
+    });
+  document
+    .getElementById("set-this-month-btn")
+    .addEventListener("click", function () {
+      setHistoryThisMonth();
+    });
+  document
+    .getElementById("apply-history-filter-btn")
+    .addEventListener("click", function () {
+      applyHistoryFilter();
+    });
+  document
+    .getElementById("print-history-btn")
+    .addEventListener("click", function () {
+      window.print();
+    });
+
+  applyHistoryFilter();
+}
+
+function setHistoryThisWeek() {
+  var today = new Date();
+  var dayOfWeek = today.getDay();
+  var mondayOffset = (dayOfWeek + 6) % 7;
+  var monday = new Date(today);
+  monday.setDate(today.getDate() - mondayOffset);
+
+  var sunday = new Date(monday);
+  sunday.setDate(monday.getDate() + 6);
+
+  document.getElementById("history-start-date").value =
+    monday.toISOString().slice(0, 10);
+  document.getElementById("history-end-date").value =
+    sunday.toISOString().slice(0, 10);
+}
+
+function setHistoryThisMonth() {
+  var today = new Date();
+  var first = new Date(today.getFullYear(), today.getMonth(), 1);
+  var last = new Date(today.getFullYear(), today.getMonth() + 1, 0);
+
+  document.getElementById("history-start-date").value =
+    first.toISOString().slice(0, 10);
+  document.getElementById("history-end-date").value =
+    last.toISOString().slice(0, 10);
+}
+
+function applyHistoryFilter() {
+  var start = document.getElementById("history-start-date").value;
+  var end = document.getElementById("history-end-date").value;
+  if (!start || !end) return;
+
+  var weights = loadArray(STORAGE_KEYS.weights).filter(function (w) {
+    return w.date >= start && w.date <= end;
+  });
+  var workouts = loadArray(STORAGE_KEYS.workouts).filter(function (w) {
+    return w.date >= start && w.date <= end;
+  });
+  var calories = loadArray(STORAGE_KEYS.calories).filter(function (c) {
+    return c.date >= start && c.date <= end;
+  });
+
+  var summary = document.getElementById("summary-text");
+  summary.textContent =
+    "Séances réalisées : " +
+    workouts.length +
+    " • Jours avec poids saisi : " +
+    weights.length +
+    " • Jours avec calories saisies : " +
+    calories.length;
+
+  var list = document.getElementById("history-workouts-list");
+  list.innerHTML = "";
+  workouts
+    .sort(function (a, b) {
+      return a.date < b.date ? -1 : 1;
+    })
+    .forEach(function (w) {
+      var div = document.createElement("div");
+      div.className = "history-workout-item";
+      var exNames = w.exercises.map(function (e) {
+        return e.name;
+      }).join(", ");
+      div.textContent =
+        formatDateHuman(w.date) + " : " + (exNames || "Aucun détail");
+      list.appendChild(div);
+    });
+
+  renderWeightChart(weights);
+  var profile = loadObject(STORAGE_KEYS.profile) || {};
+  renderBmiChart(weights, profile);
+  renderCaloriesChart(calories);
+  renderVolumeChart(workouts);
+  renderRecords(workouts);
+}
+
+function renderWeightChart(weights) {
+  var ctx = document.getElementById("weight-chart").getContext("2d");
+  if (weightChart) {
+    weightChart.destroy();
+  }
+  if (!weights.length) {
+    weightChart = new Chart(ctx, {
+      type: "line",
+      data: { labels: [], datasets: [{ data: [] }] }
+    });
+    return;
+  }
+
+  var sorted = weights.slice().sort(function (a, b) {
+    return a.date < b.date ? -1 : 1;
+  });
+  var labels = sorted.map(function (w) { return w.date; });
+  var data = sorted.map(function (w) { return w.weight; });
+
+  weightChart = new Chart(ctx, {
+    type: "line",
+    data: {
+      labels: labels,
+      datasets: [
+        {
+          label: "Poids (kg)",
+          data: data
+        }
+      ]
+    },
+    options: {
+      responsive: true,
+      plugins: {
+        legend: { display: true }
+      },
+      scales: {
+        x: { display: true },
+        y: { display: true }
+      }
+    }
+  });
+}
+
+function renderBmiChart(weights, profile) {
+  var ctx = document.getElementById("bmi-chart").getContext("2d");
+  if (bmiChart) {
+    bmiChart.destroy();
+  }
+  if (!weights.length || !profile || !profile.height) {
+    bmiChart = new Chart(ctx, {
+      type: "line",
+      data: { labels: [], datasets: [{ data: [] }] }
+    });
+    return;
+  }
+
+  var h = profile.height / 100;
+  if (!h) {
+    bmiChart = new Chart(ctx, {
+      type: "line",
+      data: { labels: [], datasets: [{ data: [] }] }
+    });
+    return;
+  }
+
+  var sorted = weights.slice().sort(function (a, b) {
+    return a.date < b.date ? -1 : 1;
+  });
+  var labels = sorted.map(function (w) { return w.date; });
+  var data = sorted.map(function (w) {
+    return +(w.weight / (h * h)).toFixed(1);
+  });
+
+  bmiChart = new Chart(ctx, {
+    type: "line",
+    data: {
+      labels: labels,
+      datasets: [
+        {
+          label: "IMC",
+          data: data
+        }
+      ]
+    },
+    options: {
+      responsive: true,
+      plugins: {
+        legend: { display: true }
+      },
+      scales: {
+        x: { display: true },
+        y: { display: true }
+      }
+    }
+  });
+}
+
+function renderCaloriesChart(entries) {
+  var ctx = document.getElementById("calories-chart").getContext("2d");
+  if (caloriesChart) {
+    caloriesChart.destroy();
+  }
+  if (!entries.length) {
+    caloriesChart = new Chart(ctx, {
+      type: "line",
+      data: { labels: [], datasets: [{ data: [] }] }
+    });
+    return;
+  }
+
+  var sorted = entries.slice().sort(function (a, b) {
+    return a.date < b.date ? -1 : 1;
+  });
+  var labels = sorted.map(function (e) { return e.date; });
+  var data = sorted.map(function (e) { return e.calories; });
+
+  caloriesChart = new Chart(ctx, {
+    type: "line",
+    data: {
+      labels: labels,
+      datasets: [
+        {
+          label: "Calories (kcal)",
+          data: data
+        }
+      ]
+    },
+    options: {
+      responsive: true,
+      plugins: {
+        legend: { display: true }
+      },
+      scales: {
+        x: { display: true },
+        y: { display: true }
+      }
+    }
+  });
+}
+
+function estimateVolumeForWorkout(workout) {
+  var total = 0;
+  workout.exercises.forEach(function (ex) {
+    var sets = ex.setsDone || 0;
+    var repsAvg = 0;
+    var numbers = (ex.repsPerSet || "").match(/\d+/g);
+    if (numbers && numbers.length > 0) {
+      var sum = numbers
+        .map(function (n) { return parseInt(n, 10); })
+        .reduce(function (a, b) { return a + b; }, 0);
+      repsAvg = sum / numbers.length;
+    }
+    var weight = ex.weightUsed || 0;
+    total += sets * repsAvg * weight;
+  });
+  return total;
+}
+
+function renderVolumeChart(workouts) {
+  var ctx = document.getElementById("volume-chart").getContext("2d");
+  if (volumeChart) {
+    volumeChart.destroy();
+  }
+  if (!workouts.length) {
+    volumeChart = new Chart(ctx, {
+      type: "bar",
+      data: { labels: [], datasets: [{ data: [] }] }
+    });
+    return;
+  }
+
+  var sorted = workouts.slice().sort(function (a, b) {
+    return a.date < b.date ? -1 : 1;
+  });
+  var labels = sorted.map(function (w) { return w.date; });
+  var data = sorted.map(function (w) { return estimateVolumeForWorkout(w); });
+
+  volumeChart = new Chart(ctx, {
+    type: "bar",
+    data: {
+      labels: labels,
+      datasets: [
+        {
+          label: "Volume (séries × reps × kg)",
+          data: data
+        }
+      ]
+    },
+    options: {
+      responsive: true,
+      plugins: {
+        legend: { display: true }
+      },
+      scales: {
+        x: { display: true },
+        y: { display: true }
+      }
+    }
+  });
+}
+
+function renderRecords(workouts) {
+  var container = document.getElementById("records-list");
+  if (!container) return;
+  container.innerHTML = "";
+
+  var records = {};
+  workouts.forEach(function (w) {
+    w.exercises.forEach(function (e) {
+      if (!e.name) return;
+      var weight = e.weightUsed || 0;
+      if (weight <= 0) return;
+      if (!records[e.name] || weight > records[e.name]) {
+        records[e.name] = weight;
+      }
+    });
+  });
+
+  var names = Object.keys(records).sort();
+  if (!names.length) {
+    container.textContent = "Aucun record pour cette période.";
+    return;
+  }
+
+  var ul = document.createElement("ul");
+  ul.style.paddingLeft = "1.2rem";
+  names.forEach(function (name) {
+    var li = document.createElement("li");
+    li.textContent = name + " : " + records[name] + " kg";
+    ul.appendChild(li);
+  });
+  container.appendChild(ul);
+}
+
+/* ---------- Onglet Paramètres ---------- */
+
+function initSettingsTab() {
+  var profile = loadObject(STORAGE_KEYS.profile) || {};
+  var prefs = loadObject(STORAGE_KEYS.preferences) || {
+    theme: "dark",
+    reminders: true
+  };
+
+  var heightInput = document.getElementById("profile-height");
+  var targetWeightInput = document.getElementById("profile-target-weight");
+  var info = document.getElementById("profile-info");
+
+  if (profile.height) heightInput.value = profile.height;
+  if (profile.targetWeight) targetWeightInput.value = profile.targetWeight;
+
+  document.getElementById("save-profile-btn").addEventListener("click", function () {
+    var height = parseInt(heightInput.value, 10) || null;
+    var targetWeight = parseFloat(targetWeightInput.value) || null;
+    var p = { height: height, targetWeight: targetWeight };
+    saveObject(STORAGE_KEYS.profile, p);
+    info.textContent = "Profil enregistré.";
+
+    var todayWeightInput = document.getElementById("today-weight-input");
+    if (todayWeightInput && todayWeightInput.value) {
+      updateTodayWeightInfo(parseFloat(todayWeightInput.value));
+    }
+  });
+
+  var themeSelect = document.getElementById("theme-select");
+  themeSelect.value = prefs.theme || "dark";
+  themeSelect.addEventListener("change", function () {
+    var newPrefs = loadObject(STORAGE_KEYS.preferences) || {};
+    newPrefs.theme = themeSelect.value;
+    saveObject(STORAGE_KEYS.preferences, newPrefs);
+    applyTheme(newPrefs.theme);
+  });
+
+  var remindersToggle = document.getElementById("reminders-toggle");
+  remindersToggle.checked = prefs.reminders !== false;
+  remindersToggle.addEventListener("change", function () {
+    var newPrefs = loadObject(STORAGE_KEYS.preferences) || {};
+    newPrefs.reminders = remindersToggle.checked;
+    saveObject(STORAGE_KEYS.preferences, newPrefs);
+    updateReminderBanner();
+  });
+
+  document.getElementById("export-data-btn").addEventListener("click", function () {
+    exportAllData();
+  });
+}
+
+function exportAllData() {
+  var data = {
+    weights: loadArray(STORAGE_KEYS.weights),
+    meals: loadArray(STORAGE_KEYS.meals),
+    program: loadArray(STORAGE_KEYS.program),
+    workouts: loadArray(STORAGE_KEYS.workouts),
+    profile: loadObject(STORAGE_KEYS.profile),
+    preferences: loadObject(STORAGE_KEYS.preferences),
+    calories: loadArray(STORAGE_KEYS.calories),
+    foodsCustom: loadObject(STORAGE_KEYS.foodsCustom)
+  };
+
+  var blob = new Blob([JSON.stringify(data, null, 2)], {
+    type: "application/json"
+  });
+  var url = URL.createObjectURL(blob);
+  var a = document.createElement("a");
+  a.href = url;
+  a.download = "suivi-sport-donnees.json";
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+}
