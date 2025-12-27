@@ -33,6 +33,38 @@
           <p id="today-weight-info" class="small-info"></p>
         </section>
 
+<section class="card">
+  <h3>Composition corporelle (optionnel)</h3>
+
+  <div class="grid-2">
+    <div class="field">
+      <label>Masse grasse (%)</label>
+      <input id="today-fat-input" type="number" step="0.1" placeholder="ex : 24.5" />
+    </div>
+
+    <div class="field">
+      <label>Masse musculaire (%)</label>
+      <input id="today-muscle-input" type="number" step="0.1" placeholder="ex : 38.2" />
+    </div>
+
+    <div class="field">
+      <label>Masse hydrique / eau (%)</label>
+      <input id="today-water-input" type="number" step="0.1" placeholder="ex : 55.8" />
+    </div>
+
+    <div class="field">
+      <label>Masse osseuse (kg)</label>
+      <input id="today-bone-input" type="number" step="0.1" placeholder="ex : 3.1" />
+    </div>
+  </div>
+
+  <div class="row">
+    <button id="save-today-bodycomp-btn" class="primary-btn">Enregistrer</button>
+  </div>
+
+  <p id="today-bodycomp-info" class="small-info"></p>
+</section>
+
         <!-- Alimentation -->
         <section class="card">
           <h3>Alimentation du jour</h3>
