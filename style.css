@@ -368,3 +368,18 @@ body.light-theme .modal-content {
   background: #ffffff;
   border-color: #e5e7eb;
 }
+
+.grid-2{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:12px;
+}
+@media (max-width:700px){
+  .grid-2{ grid-template-columns:1fr; }
+}
+.field label{
+  display:block;
+  margin-bottom:6px;
+  font-size:0.9rem;
+  opacity:0.85;
+}
