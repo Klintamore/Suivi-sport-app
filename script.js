@@ -7,7 +7,8 @@ const STORAGE_KEYS = {
   profile: "ss_profile",
   preferences: "ss_preferences",
   calories: "ss_calories",
-  foodsCustom: "ss_foods_custom"
+  foodsCustom: "ss_foods_custom",
+  bodyComp: "ss_body_comp"
 };
 
 let weightChart = null;
