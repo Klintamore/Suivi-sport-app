@@ -20,6 +20,7 @@ document.addEventListener("DOMContentLoaded", function () {
   initThemeAndPreferences();
   setupNavigation();
   initTodayTab();
+  initBodyCompToday();
   initProgramTab();
   initHistoryTab();
   initSettingsTab();
@@ -1526,4 +1527,77 @@ function exportAllData() {
   a.click();
   document.body.removeChild(a);
   URL.revokeObjectURL(url);
+}
+function initBodyCompToday() {
+  const today = getTodayDateString();
+
+  const fatI = document.getElementById("today-fat-input");
+  const musI = document.getElementById("today-muscle-input");
+  const watI = document.getElementById("today-water-input");
+  const bonI = document.getElementById("today-bone-input");
+  const info = document.getElementById("today-bodycomp-info");
+  const saveBtn = document.getElementById("save-today-bodycomp-btn");
+
+  // Si le HTML n’est pas encore intégré, on sort sans planter l’appli
+  if (!fatI || !saveBtn || !info) return;
+
+  // Charger si déjà saisi
+  const list = loadArray(STORAGE_KEYS.bodyComp);
+  const entry = list.find(e => e.date === today);
+
+  if (entry) {
+    if (entry.fat != null) fatI.value = entry.fat;
+    if (entry.muscle != null) musI.value = entry.muscle;
+    if (entry.water != null) watI.value = entry.water;
+    if (entry.bone != null) bonI.value = entry.bone;
+    info.textContent = bodyCompSummary(entry);
+  } else {
+    info.textContent = "Aucune composition saisie pour aujourd'hui.";
+  }
+
+  saveBtn.addEventListener("click", () => {
+    const fat = parseFloat(fatI.value);
+    const muscle = parseFloat(musI.value);
+    const water = parseFloat(watI.value);
+    const bone = parseFloat(bonI.value);
+
+    const any =
+      !Number.isNaN(fat) || !Number.isNaN(muscle) || !Number.isNaN(water) || !Number.isNaN(bone);
+
+    if (!any) {
+      alert("Saisis au moins une valeur (graisse, muscle, eau ou os).");
+      return;
+    }
+
+    // Contrôles simples (évite les fautes de frappe)
+    if (!Number.isNaN(fat) && (fat < 0 || fat > 70)) { alert("Graisse (%) incohérente."); return; }
+    if (!Number.isNaN(muscle) && (muscle < 0 || muscle > 70)) { alert("Muscle (%) incohérent."); return; }
+    if (!Number.isNaN(water) && (water < 0 || water > 80)) { alert("Eau (%) incohérente."); return; }
+    if (!Number.isNaN(bone) && (bone < 0 || bone > 10)) { alert("Os (kg) incohérent."); return; }
+
+    const obj = {
+      date: today,
+      fat: Number.isNaN(fat) ? null : fat,
+      muscle: Number.isNaN(muscle) ? null : muscle,
+      water: Number.isNaN(water) ? null : water,
+      bone: Number.isNaN(bone) ? null : bone
+    };
+
+    const arr = loadArray(STORAGE_KEYS.bodyComp);
+    const idx = arr.findIndex(e => e.date === today);
+    if (idx >= 0) arr[idx] = obj;
+    else arr.push(obj);
+
+    saveArray(STORAGE_KEYS.bodyComp, arr);
+    info.textContent = bodyCompSummary(obj);
+  });
+}
+
+function bodyCompSummary(e) {
+  const parts = [];
+  if (e.fat != null) parts.push(`Graisse : ${e.fat}%`);
+  if (e.muscle != null) parts.push(`Muscle : ${e.muscle}%`);
+  if (e.water != null) parts.push(`Eau : ${e.water}%`);
+  if (e.bone != null) parts.push(`Os : ${e.bone} kg`);
+  return parts.length ? parts.join(" • ") : "Aucune composition saisie.";
 }
