@@ -120,6 +120,51 @@
         </section>
       </section>
 
+        <!-- Cardio du jour -->
+<div class="card">
+  <h3>Cardio du jour (optionnel)</h3>
+
+  <label>Activité</label>
+  <select id="cardio-activity">
+    <option value="walk">Marche</option>
+    <option value="run">Course</option>
+    <option value="row">Rameur</option>
+    <option value="bike">Vélo</option>
+    <option value="elliptical">Elliptique</option>
+    <option value="swim">Natation</option>
+  </select>
+
+  <label>Intensité</label>
+  <select id="cardio-intensity">
+    <option value="easy">Facile</option>
+    <option value="moderate">Modérée</option>
+    <option value="hard">Soutenue</option>
+  </select>
+
+  <label>Durée (minutes)</label>
+  <input id="cardio-duration" type="number" inputmode="numeric" placeholder="Ex : 45" />
+
+  <label>Terrain</label>
+  <select id="cardio-terrain">
+    <option value="flat">Plat</option>
+    <option value="mixed">Mixte</option>
+    <option value="trail">Trail / irrégulier</option>
+    <option value="treadmill">Tapis</option>
+  </select>
+
+  <label>Dénivelé (m) — optionnel</label>
+  <input id="cardio-elevation" type="number" inputmode="numeric" placeholder="Ex : 250" />
+
+  <label>Détails (optionnel)</label>
+  <input id="cardio-notes" type="text" placeholder="Ex : chemin côtier, vent, chaussures lourdes…" />
+
+  <button id="save-today-cardio-btn" class="btn-primary">Enregistrer</button>
+
+  <div id="today-cardio-info" class="muted" style="margin-top:.6rem;">
+    Aucune activité cardio saisie.
+  </div>
+</div>
+
       <!-- Onglet Programme -->
       <section id="tab-program" class="tab-section">
         <h2>Programme de la semaine</h2>
