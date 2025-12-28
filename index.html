@@ -153,6 +153,33 @@
       <section id="tab-history" class="tab-section">
         <h2>Historique & Stats</h2>
 
+
+        <section class="card">
+          <h3>Période</h3>
+          <div class="row row-wrap">
+            <div class="col-2">
+              <label for="history-start-date">Du</label>
+              <input type="date" id="history-start-date" />
+            </div>
+            <div class="col-2">
+              <label for="history-end-date">Au</label>
+              <input type="date" id="history-end-date" />
+            </div>
+          </div>
+          <div class="row">
+            <button id="set-this-week-btn" class="secondary-btn">Cette semaine</button>
+            <button id="set-this-month-btn" class="secondary-btn">Ce mois</button>
+            <button id="apply-history-filter-btn" class="primary-btn">Appliquer</button>
+            <button id="print-history-btn" class="secondary-btn">Exporter en PDF</button>
+          </div>
+        </section>
+
+        <section class="card">
+          <h3>Résumé</h3>
+          <p id="summary-text"></p>
+        </section>
+
+
 <section class="card">
   <h3>Composition corporelle</h3>
 
@@ -181,31 +208,6 @@
     <canvas id="bone-chart" height="200"></canvas>
   </div>
 </section>
-
-        <section class="card">
-          <h3>Période</h3>
-          <div class="row row-wrap">
-            <div class="col-2">
-              <label for="history-start-date">Du</label>
-              <input type="date" id="history-start-date" />
-            </div>
-            <div class="col-2">
-              <label for="history-end-date">Au</label>
-              <input type="date" id="history-end-date" />
-            </div>
-          </div>
-          <div class="row">
-            <button id="set-this-week-btn" class="secondary-btn">Cette semaine</button>
-            <button id="set-this-month-btn" class="secondary-btn">Ce mois</button>
-            <button id="apply-history-filter-btn" class="primary-btn">Appliquer</button>
-            <button id="print-history-btn" class="secondary-btn">Exporter en PDF</button>
-          </div>
-        </section>
-
-        <section class="card">
-          <h3>Résumé</h3>
-          <p id="summary-text"></p>
-        </section>
 
         <section class="card">
           <h3>Évolution du poids</h3>
