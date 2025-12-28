@@ -16,6 +16,9 @@ let bmiChart = null;
 let caloriesChart = null;
 let volumeChart = null;
 
+const bodyCharts = {};
+let weightFatChart = null;
+
 document.addEventListener("DOMContentLoaded", function () {
   initThemeAndPreferences();
   setupNavigation();
