@@ -9,7 +9,7 @@ const STORAGE_KEYS = {
   calories: "ss_calories",
   foodsCustom: "ss_foods_custom",
   bodyComp: "ss_body_comp",
-  cardio: "ss_cardio"
+  cardio: "ss_cardio",
 };
 
 let weightChart = null;
@@ -29,6 +29,7 @@ document.addEventListener("DOMContentLoaded", function () {
   initHistoryTab();
   initSettingsTab();
   initWorkoutModal();
+  initCardioToday();
 });
 
 /* ---------- Helpers généraux ---------- */
