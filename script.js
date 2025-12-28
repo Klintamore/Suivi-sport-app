@@ -1213,6 +1213,15 @@ function applyHistoryFilter() {
       list.appendChild(div);
     });
 
+const body = loadArray(STORAGE_KEYS.bodyComp).filter(b => b.date >= start && b.date <= end);
+
+renderBodyChart(body, "fat-chart", "Masse grasse (%)", "fat");
+renderBodyChart(body, "muscle-chart", "Masse musculaire (%)", "muscle");
+renderBodyChart(body, "water-chart", "Eau (%)", "water");
+renderBodyChart(body, "bone-chart", "Masse osseuse (kg)", "bone");
+
+renderWeightFatChart(weights, body);
+
   renderWeightChart(weights);
   var profile = loadObject(STORAGE_KEYS.profile) || {};
   renderBmiChart(weights, profile);
