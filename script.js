@@ -34,6 +34,160 @@ document.addEventListener("DOMContentLoaded", function () {
 
 /* ---------- Helpers généraux ---------- */
 
+function getBestWeightForCalories(today) {
+  // 1) poids du jour si dispo, sinon profil, sinon null
+  var weights = loadArray(STORAGE_KEYS.weights);
+  var w = weights.find(function (x) { return x.date === today; });
+  if (w && !isNaN(w.weight)) return w.weight;
+
+  var profile = loadObject(STORAGE_KEYS.profile) || {};
+  if (profile && !isNaN(profile.weight)) return profile.weight;
+
+  return null;
+}
+
+function getMET(activity, intensity) {
+  // MET simples (approx). Tu ajusteras plus tard si tu veux.
+  var table = {
+    walk: { easy: 2.8, moderate: 3.8, hard: 5.0 },
+    run: { easy: 7.0, moderate: 9.8, hard: 12.0 },
+    row: { easy: 4.8, moderate: 7.0, hard: 8.5 },
+    bike: { easy: 4.0, moderate: 6.8, hard: 10.0 },
+    elliptical: { easy: 5.0, moderate: 7.0, hard: 9.0 },
+    swim: { easy: 6.0, moderate: 8.0, hard: 10.0 }
+  };
+  return (table[activity] && table[activity][intensity]) ? table[activity][intensity] : 4.0;
+}
+
+function applyTerrainAndElevationBonus(baseMET, terrain, elevationMeters) {
+  var met = baseMET;
+
+  // Bonus terrain
+  if (terrain === "mixed") met *= 1.05;
+  if (terrain === "trail") met *= 1.12;
+  if (terrain === "treadmill") met *= 1.00;
+
+  // Bonus dénivelé (très simple, plafonné)
+  var elev = parseFloat(elevationMeters);
+  if (!isNaN(elev) && elev > 0) {
+    var bonus = 1 + Math.min(elev / 1000, 0.25); // +25% max à 1000m+
+    met *= bonus;
+  }
+
+  return met;
+}
+
+function estimateCardioCalories(entry, weightKg) {
+  var minutes = parseFloat(entry.durationMin);
+  if (isNaN(minutes) || minutes <= 0) return 0;
+
+  var met = getMET(entry.activity, entry.intensity);
+  met = applyTerrainAndElevationBonus(met, entry.terrain, entry.elevation || 0);
+
+  var hours = minutes / 60;
+  var cals = met * weightKg * hours;
+  return Math.round(cals);
+}
+
+function cardioSummaryText(e, weightKg) {
+  var parts = [];
+  var activityLabel = {
+    walk: "Marche",
+    run: "Course",
+    row: "Rameur",
+    bike: "Vélo",
+    elliptical: "Elliptique",
+    swim: "Natation"
+  }[e.activity] || "Cardio";
+
+  parts.push(activityLabel);
+  if (e.durationMin) parts.push(e.durationMin + " min");
+
+  var details = [];
+  if (e.terrain) {
+    var t = { flat: "plat", mixed: "mixte", trail: "trail", treadmill: "tapis" }[e.terrain] || e.terrain;
+    details.push(t);
+  }
+  if (e.elevation) details.push("+" + e.elevation + " m");
+  if (details.length) parts.push("(" + details.join(", ") + ")");
+
+  if (weightKg) {
+    var kcal = estimateCardioCalories(e, weightKg);
+    parts.push("≈ " + kcal + " kcal");
+  } else {
+    parts.push("≈ ? kcal (poids manquant)");
+  }
+
+  if (e.notes) parts.push("— " + e.notes);
+
+  return parts.join(" • ");
+}
+
+function initCardioToday() {
+  var today = getTodayDateString();
+
+  var activityEl = document.getElementById("cardio-activity");
+  var intensityEl = document.getElementById("cardio-intensity");
+  var durationEl = document.getElementById("cardio-duration");
+  var terrainEl = document.getElementById("cardio-terrain");
+  var elevationEl = document.getElementById("cardio-elevation");
+  var notesEl = document.getElementById("cardio-notes");
+  var saveBtn = document.getElementById("save-today-cardio-btn");
+  var infoEl = document.getElementById("today-cardio-info");
+
+  // Si le HTML n’est pas encore là, on sort
+  if (!activityEl || !saveBtn || !infoEl) return;
+
+  // Charger si déjà saisi
+  var list = loadArray(STORAGE_KEYS.cardio);
+  var existing = list.find(function (x) { return x.date === today; });
+
+  if (existing) {
+    activityEl.value = existing.activity || "walk";
+    intensityEl.value = existing.intensity || "easy";
+    durationEl.value = existing.durationMin || "";
+    terrainEl.value = existing.terrain || "flat";
+    elevationEl.value = existing.elevation || "";
+    notesEl.value = existing.notes || "";
+
+    var w = getBestWeightForCalories(today);
+    infoEl.textContent = cardioSummaryText(existing, w);
+  } else {
+    infoEl.textContent = "Aucune activité cardio saisie.";
+  }
+
+  saveBtn.addEventListener("click", function () {
+    var durationMin = parseFloat(durationEl.value);
+    if (isNaN(durationMin) || durationMin <= 0) {
+      alert("Merci de saisir une durée (minutes) valide.");
+      return;
+    }
+
+    var obj = {
+      date: today,
+      activity: activityEl.value,
+      intensity: intensityEl.value,
+      durationMin: Math.round(durationMin),
+      terrain: terrainEl.value,
+      elevation: elevationEl.value ? parseFloat(elevationEl.value) : null,
+      notes: (notesEl.value || "").trim()
+    };
+
+    var arr = loadArray(STORAGE_KEYS.cardio);
+    var idx = arr.findIndex(function (x) { return x.date === today; });
+    if (idx >= 0) arr[idx] = obj;
+    else arr.push(obj);
+
+    saveArray(STORAGE_KEYS.cardio, arr);
+
+    var w = getBestWeightForCalories(today);
+    infoEl.textContent = cardioSummaryText(obj, w);
+
+    // Optionnel: rafraîchir bannière rappels ou stats si tu veux plus tard
+    // updateReminderBanner();
+  });
+}
+
 function getTodayDateString() {
   var d = new Date();
   return d.toISOString().slice(0, 10);
