@@ -1335,7 +1335,7 @@ function renderCaloriesChart(entries) {
   if (!entries.length) {
     caloriesChart = new Chart(ctx, {
       type: "line",
-      data: { labels: [], datasets: [{ data: [] }] }
+      data: { labels: [Calories (Kcal)], datasets: [{ data: [] }] }
     });
     return;
   }
