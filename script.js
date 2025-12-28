@@ -1617,10 +1617,12 @@ function initBodyCompToday() {
 function bodyCompSummary(e) {
   const parts = [];
   if (e.fat != null) parts.push(`Graisse : ${e.fat}%`);
-  if (e.muscle != null) parts.push(`Muscle : ${e.muscle}%`);
   if (e.water != null) parts.push(`Eau : ${e.water}%`);
+  if (e.muscle != null) parts.push(`Muscle : ${e.muscle}%`);
   if (e.bone != null) parts.push(`Os : ${e.bone} kg`);
-  return parts.length ? parts.join(" • ") : "Aucune composition saisie.";
+  return parts.length
+    ? parts.join(" • ")
+    : "Aucune composition saisie.";
 }
 
 function renderBodyChart(entries, canvasId, label, field) {
