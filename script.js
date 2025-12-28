@@ -1613,3 +1613,83 @@ function bodyCompSummary(e) {
   if (e.bone != null) parts.push(`Os : ${e.bone} kg`);
   return parts.length ? parts.join(" • ") : "Aucune composition saisie.";
 }
+
+function renderBodyChart(entries, canvasId, label, field) {
+  const el = document.getElementById(canvasId);
+  if (!el || !el.getContext) return;
+
+  const ctx = el.getContext("2d");
+  if (bodyCharts[canvasId]) bodyCharts[canvasId].destroy();
+
+  const sorted = (entries || []).slice().sort((a, b) => (a.date < b.date ? -1 : 1));
+  const filtered = sorted.filter(e => e[field] != null);
+
+  // Pas de données = graphe vide (évite erreurs)
+  if (!filtered.length) {
+    bodyCharts[canvasId] = new Chart(ctx, {
+      type: "line",
+      data: { labels: [], datasets: [{ label, data: [] }] },
+      options: { responsive: true, plugins: { legend: { display: true } } }
+    });
+    return;
+  }
+
+  bodyCharts[canvasId] = new Chart(ctx, {
+    type: "line",
+    data: {
+      labels: filtered.map(e => e.date),
+      datasets: [{ label: label, data: filtered.map(e => e[field]) }]
+    },
+    options: {
+      responsive: true,
+      plugins: { legend: { display: true } },
+      scales: { x: { display: true }, y: { display: true } }
+    }
+  });
+}
+
+function renderWeightFatChart(weights, body) {
+  const el = document.getElementById("weight-fat-chart");
+  if (!el || !el.getContext) return;
+
+  const ctx = el.getContext("2d");
+  if (weightFatChart) weightFatChart.destroy();
+
+  const wMap = {};
+  (weights || []).forEach(w => { wMap[w.date] = w.weight; });
+
+  const fMap = {};
+  (body || []).forEach(b => { if (b.fat != null) fMap[b.date] = b.fat; });
+
+  const dates = Object.keys(wMap)
+    .filter(d => fMap[d] != null)
+    .sort((a, b) => (a < b ? -1 : 1));
+
+  if (!dates.length) {
+    weightFatChart = new Chart(ctx, {
+      type: "line",
+      data: { labels: [], datasets: [{ label: "Poids (kg)", data: [] }, { label: "Masse grasse (%)", data: [] }] },
+      options: { responsive: true }
+    });
+    return;
+  }
+
+  weightFatChart = new Chart(ctx, {
+    type: "line",
+    data: {
+      labels: dates,
+      datasets: [
+        { label: "Poids (kg)", data: dates.map(d => wMap[d]), yAxisID: "yWeight" },
+        { label: "Masse grasse (%)", data: dates.map(d => fMap[d]), yAxisID: "yFat" }
+      ]
+    },
+    options: {
+      responsive: true,
+      plugins: { legend: { display: true } },
+      scales: {
+        yWeight: { type: "linear", position: "left", display: true, title: { display: true, text: "kg" } },
+        yFat: { type: "linear", position: "right", display: true, title: { display: true, text: "%" } }
+      }
+    }
+  });
+}
