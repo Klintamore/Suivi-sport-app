@@ -8,7 +8,8 @@ const STORAGE_KEYS = {
   preferences: "ss_preferences",
   calories: "ss_calories",
   foodsCustom: "ss_foods_custom",
-  bodyComp: "ss_body_comp"
+  bodyComp: "ss_body_comp",
+  cardio: "ss_cardio"
 };
 
 let weightChart = null;
