@@ -1333,12 +1333,21 @@ function renderCaloriesChart(entries) {
     caloriesChart.destroy();
   }
   if (!entries.length) {
-    caloriesChart = new Chart(ctx, {
-      type: "line",
-      data: { labels: [Calories (Kcal)], datasets: [{ data: [] }] }
-    });
-    return;
-  }
+  caloriesChart = new Chart(ctx, {
+    type: "line",
+    data: {
+      labels: [],
+      datasets: [
+        {
+          label: "Calories (kcal)",
+          data: []
+        }
+      ]
+    },
+    options: { responsive: true }
+  });
+  return;
+}
 
   var sorted = entries.slice().sort(function (a, b) {
     return a.date < b.date ? -1 : 1;
