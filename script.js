@@ -123,6 +123,29 @@ function cardioSummaryText(e, weightKg) {
   return parts.join(" • ");
 }
 
+function renderTodayCardioInfo(dateStr) {
+  var infoEl = document.getElementById("today-cardio-info");
+  if (!infoEl) return;
+
+  var list = loadArray(STORAGE_KEYS.cardio).filter(function (x) {
+    return x.date === dateStr;
+  });
+
+  if (!list.length) {
+    infoEl.textContent = "Aucune activité cardio saisie.";
+    return;
+  }
+
+  // Affichage simple (1 ligne par séance)
+  infoEl.innerHTML = list
+    .map(function (s) {
+      var elev = s.elevation ? (" • +" + s.elevation + " m") : "";
+      var notes = s.notes ? (" • " + s.notes) : "";
+      return "• " + s.activity + " (" + s.intensity + ") — " + s.durationMin + " min" + elev + notes;
+    })
+    .join("<br>");
+}
+
 function initCardioToday() {
   var today = getTodayDateString();
 
