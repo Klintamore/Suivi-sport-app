@@ -167,7 +167,7 @@ renderTodayCardioInfo(today);
   saveBtn.addEventListener("click", function () {
   var durationMin = parseFloat(durationEl.value);
   if (isNaN(durationMin) || durationMin <= 0) {
-    alert("Durée invalide.");
+    alert("Merci de saisir une durée valide.");
     return;
   }
 
@@ -176,18 +176,25 @@ renderTodayCardioInfo(today);
     date: today,
     activity: activityEl.value,
     intensity: intensityEl.value,
-    durationMin: Math.round(durationMin),
-    terrain: terrainEl.value,
-    elevation: elevationEl.value ? parseFloat(elevationEl.value) : null,
-    notes: notesEl.value || "",
+    durationMin: durationMin,
+    terrain: terrainEl ? terrainEl.value : "",
+    elevation: parseFloat(elevationEl.value),
+    notes: notesEl.value.trim(),
     createdAt: Date.now()
   };
 
+  if (isNaN(entry.elevation)) entry.elevation = null;
+
   var list = loadArray(STORAGE_KEYS.cardio);
-  list.push(entry); // ✅ TOUJOURS ajouter
+  list.push(entry);
   saveArray(STORAGE_KEYS.cardio, list);
 
-  renderTodayCardioList();
+  renderTodayCardioInfo(today);
+
+  // optionnel : reset champs
+  // durationEl.value = "";
+  // elevationEl.value = "";
+  // notesEl.value = "";
 });
   saveBtn.addEventListener("click", function () {
     var durationMin = parseFloat(durationEl.value);
