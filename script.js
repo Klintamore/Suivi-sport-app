@@ -140,22 +140,32 @@ function initCardioToday() {
 
   // Charger si déjà saisi
   var list = loadArray(STORAGE_KEYS.cardio);
-  var existing = list.find(function (x) { return x.date === today; });
 
-  if (existing) {
-    activityEl.value = existing.activity || "walk";
-    intensityEl.value = existing.intensity || "easy";
-    durationEl.value = existing.durationMin || "";
-    terrainEl.value = existing.terrain || "flat";
-    elevationEl.value = existing.elevation || "";
-    notesEl.value = existing.notes || "";
-
-    var w = getBestWeightForCalories(today);
-    infoEl.textContent = cardioSummaryText(existing, w);
-  } else {
-    infoEl.textContent = "Aucune activité cardio saisie.";
+  saveBtn.addEventListener("click", function () {
+  var durationMin = parseFloat(durationEl.value);
+  if (isNaN(durationMin) || durationMin <= 0) {
+    alert("Durée invalide.");
+    return;
   }
 
+  var entry = {
+    id: "c_" + Date.now(),
+    date: today,
+    activity: activityEl.value,
+    intensity: intensityEl.value,
+    durationMin: Math.round(durationMin),
+    terrain: terrainEl.value,
+    elevation: elevationEl.value ? parseFloat(elevationEl.value) : null,
+    notes: notesEl.value || "",
+    createdAt: Date.now()
+  };
+
+  var list = loadArray(STORAGE_KEYS.cardio);
+  list.push(entry); // ✅ TOUJOURS ajouter
+  saveArray(STORAGE_KEYS.cardio, list);
+
+  renderTodayCardioList();
+});
   saveBtn.addEventListener("click", function () {
     var durationMin = parseFloat(durationEl.value);
     if (isNaN(durationMin) || durationMin <= 0) {
