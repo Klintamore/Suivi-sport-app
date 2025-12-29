@@ -163,7 +163,7 @@ function initCardioToday() {
 
   // Charger si déjà saisi
   var list = loadArray(STORAGE_KEYS.cardio);
-
+renderTodayCardioInfo(today);
   saveBtn.addEventListener("click", function () {
   var durationMin = parseFloat(durationEl.value);
   if (isNaN(durationMin) || durationMin <= 0) {
