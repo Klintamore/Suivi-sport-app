@@ -155,7 +155,7 @@ function initCardioToday() {
   var terrainEl = document.getElementById("cardio-terrain");
   var elevationEl = document.getElementById("cardio-elevation");
   var notesEl = document.getElementById("cardio-notes");
-  var saveBtn = document.getElementById("save-today-cardio-btn");
+  var saveBtn = document.getElementById("add-today-cardio-btn");
   var infoEl = document.getElementById("today-cardio-info");
 
   // Si le HTML n’est pas encore là, on sort
