@@ -203,26 +203,6 @@ renderTodayCardioInfo(today);
       return;
     }
 
-    var obj = {
-      date: today,
-      activity: activityEl.value,
-      intensity: intensityEl.value,
-      durationMin: Math.round(durationMin),
-      terrain: terrainEl.value,
-      elevation: elevationEl.value ? parseFloat(elevationEl.value) : null,
-      notes: (notesEl.value || "").trim()
-    };
-
-    var arr = loadArray(STORAGE_KEYS.cardio);
-    var idx = arr.findIndex(function (x) { return x.date === today; });
-    if (idx >= 0) arr[idx] = obj;
-    else arr.push(obj);
-
-    saveArray(STORAGE_KEYS.cardio, arr);
-
-    var w = getBestWeightForCalories(today);
-    infoEl.textContent = cardioSummaryText(obj, w);
-
     // Optionnel: rafraîchir bannière rappels ou stats si tu veux plus tard
     // updateReminderBanner();
   });
