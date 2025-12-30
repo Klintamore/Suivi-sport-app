@@ -146,58 +146,7 @@ function renderTodayCardioInfo(dateStr) {
     .join("<br>");
 }
 
-function initCardioToday() {
-  var today = getTodayDateString();
 
-  var activityEl = document.getElementById("cardio-activity");
-  var intensityEl = document.getElementById("cardio-intensity");
-  var durationEl = document.getElementById("cardio-duration");
-  var terrainEl = document.getElementById("cardio-terrain");
-  var elevationEl = document.getElementById("cardio-elevation");
-  var notesEl = document.getElementById("cardio-notes");
-  var saveBtn = document.getElementById("add-today-cardio-btn");
-  var infoEl = document.getElementById("today-cardio-info");
-
-  // Si le HTML n’est pas encore là, on sort
-  if (!activityEl || !saveBtn || !infoEl) return;
-
-  // Charger si déjà saisi
-  var list = loadArray(STORAGE_KEYS.cardio);
-renderTodayCardioInfo(today);
-  saveBtn.addEventListener("click", function () {
-  var durationMin = parseFloat(durationEl.value);
-  if (isNaN(durationMin) || durationMin <= 0) {
-    alert("Merci de saisir une durée valide.");
-    return;
-  }
-
-  var entry = {
-    id: "c_" + Date.now(),
-    date: today,
-    activity: activityEl.value,
-    intensity: intensityEl.value,
-    durationMin: durationMin,
-    terrain: terrainEl ? terrainEl.value : "",
-    elevation: parseFloat(elevationEl.value),
-    notes: notesEl.value.trim(),
-    createdAt: Date.now()
-  };
-
-  if (isNaN(entry.elevation)) entry.elevation = null;
-
-  var list = loadArray(STORAGE_KEYS.cardio);
-  list.push(entry);
-  saveArray(STORAGE_KEYS.cardio, list);
-
-  renderTodayCardioInfo(today);
-
-  // optionnel : reset champs
-  // durationEl.value = "";
-  // elevationEl.value = "";
-  // notesEl.value = "";
-});
-  
-}
 
 function getTodayDateString() {
   var d = new Date();
