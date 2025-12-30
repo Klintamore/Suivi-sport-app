@@ -895,8 +895,8 @@ function initCardioToday() {
   // Si le HTML n’est pas encore là, on sort
   if (!activityEl || !saveBtn || !infoEl) return;
 
-  // Afficher la liste au chargement
-  renderTodayCardioInfo(today);
+  // Afficher la liste cardio au chargement
+  renderTodayCardio(today);
 
   // ✅ Un SEUL listener : on AJOUTE une séance
   saveBtn.addEventListener("click", function () {
@@ -925,7 +925,7 @@ function initCardioToday() {
     list.push(entry);
     saveArray(STORAGE_KEYS.cardio, list);
 
-    renderTodayCardioInfo(today);
+    renderTodayCardio(today);
 
     // Optionnel reset
     // durationEl.value = "";
