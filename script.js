@@ -358,7 +358,7 @@ function initTodayTab() {
     updateTodayWeightInfo(null);
   }
 
-  saveWeightBtn.addEventListener("click", function () {
+  onClick("save-today-weight-btn", function () {
     var val = parseFloat(weightInput.value);
     if (isNaN(val)) {
       alert("Merci de saisir un poids valide.");
@@ -431,7 +431,7 @@ function initTodayTab() {
     updateTodayCaloriesInfo(null);
   }
 
-  onClick("TON_ID_ICI", function () {
+  onClick("auto-calc-calories-btn", function () {
     foodCalcContext = {
       date: today,
       texts: {
