@@ -825,6 +825,65 @@ function updateTodayWorkoutPreview() {
   preview.appendChild(ul);
 }
 
+/* ---------- Séance du jour : cardio ---------- */
+
+function initCardioToday() {
+  var today = getTodayDateString();
+
+  var activityEl = document.getElementById("cardio-activity");
+  var intensityEl = document.getElementById("cardio-intensity");
+  var durationEl = document.getElementById("cardio-duration");
+  var terrainEl = document.getElementById("cardio-terrain");
+  var elevationEl = document.getElementById("cardio-elevation");
+  var notesEl = document.getElementById("cardio-notes");
+
+  // ✅ Bon ID (celui de ton HTML)
+  var saveBtn = document.getElementById("add-today-cardio-btn");
+
+  var infoEl = document.getElementById("today-cardio-info");
+
+  // Si le HTML n’est pas encore là, on sort
+  if (!activityEl || !saveBtn || !infoEl) return;
+
+  // Afficher la liste au chargement
+  renderTodayCardioInfo(today);
+
+  // ✅ Un SEUL listener : on AJOUTE une séance
+  saveBtn.addEventListener("click", function () {
+    var durationMin = parseFloat(durationEl.value);
+    if (isNaN(durationMin) || durationMin <= 0) {
+      alert("Merci de saisir une durée valide.");
+      return;
+    }
+
+    var elev = elevationEl ? parseFloat(elevationEl.value) : NaN;
+    if (isNaN(elev)) elev = null;
+
+    var entry = {
+      id: "c_" + Date.now(),
+      date: today,
+      activity: activityEl.value,
+      intensity: intensityEl.value,
+      durationMin: Math.round(durationMin),
+      terrain: terrainEl ? terrainEl.value : "flat",
+      elevation: elev,
+      notes: notesEl ? (notesEl.value || "").trim() : "",
+      createdAt: Date.now()
+    };
+
+    var list = loadArray(STORAGE_KEYS.cardio);
+    list.push(entry);
+    saveArray(STORAGE_KEYS.cardio, list);
+
+    renderTodayCardioInfo(today);
+
+    // Optionnel reset
+    // durationEl.value = "";
+    // if (elevationEl) elevationEl.value = "";
+    // if (notesEl) notesEl.value = "";
+  });
+}
+
 /* ---------- Onglet Programme ---------- */
 
 var selectedProgramDate = getTodayDateString();
