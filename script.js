@@ -196,16 +196,7 @@ renderTodayCardioInfo(today);
   // elevationEl.value = "";
   // notesEl.value = "";
 });
-  saveBtn.addEventListener("click", function () {
-    var durationMin = parseFloat(durationEl.value);
-    if (isNaN(durationMin) || durationMin <= 0) {
-      alert("Merci de saisir une durée (minutes) valide.");
-      return;
-    }
-
-    // Optionnel: rafraîchir bannière rappels ou stats si tu veux plus tard
-    // updateReminderBanner();
-  });
+  
 }
 
 function getTodayDateString() {
