@@ -137,7 +137,7 @@ function cardioSummaryText(e, weightKg) {
 
   return parts.join(" • ");
 }
-
+/*
 function renderTodayCardioInfo(dateStr) {
   var infoEl = document.getElementById("today-cardio-info");
   if (!infoEl) return;
@@ -160,7 +160,7 @@ function renderTodayCardioInfo(dateStr) {
     })
     .join("<br>");
 }
-
+*/
 function renderTodayCardio(today) {
   var listEl = document.getElementById("today-cardio-list");
   var infoEl = document.getElementById("today-cardio-info");
