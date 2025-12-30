@@ -568,7 +568,6 @@ if (saveCardioBtn) {
 
   saveCardioBtn.addEventListener("click", function () {
     console.log("CLICK CARDIO OK");
-alert("CLICK CARDIO OK");
 
     var duration = parseInt(cardioDuration.value, 10);
     if (isNaN(duration) || duration <= 0) {
