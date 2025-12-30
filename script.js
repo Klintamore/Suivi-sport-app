@@ -457,6 +457,12 @@ function initTodayTab() {
     }
   });
 
+  // Évite les listeners doublons si initTodayTab() est rappelée
+var oldBtn = saveCaloriesBtn;
+var newBtn = oldBtn.cloneNode(true);
+oldBtn.parentNode.replaceChild(newBtn, oldBtn);
+saveCaloriesBtn = newBtn;
+
   saveCaloriesBtn.addEventListener("click", function () {
     var val = parseInt(caloriesInput.value, 10);
     if (isNaN(val)) {
