@@ -415,6 +415,7 @@ function initTodayTab() {
     saveArray(STORAGE_KEYS.weights, list);
     updateTodayWeightInfo(val);
     updateReminderBanner();
+    renderTodayCardio(today);
   });
 
   // Alimentation du jour
