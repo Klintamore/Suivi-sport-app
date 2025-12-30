@@ -588,6 +588,10 @@ if (saveCardioBtn) {
     var arr = loadArray(STORAGE_KEYS.cardio);
     arr.push(entry);
     saveArray(STORAGE_KEYS.cardio, arr);
+    
+cardioDuration.value = "";
+if (cardioElevation) cardioElevation.value = "";
+if (cardioNotes) cardioNotes.value = "";
 
     if (typeof renderTodayCardio === "function") {
       renderTodayCardio(today);
