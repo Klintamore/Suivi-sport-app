@@ -161,6 +161,46 @@ function renderTodayCardioInfo(dateStr) {
     .join("<br>");
 }
 
+function renderTodayCardio(today) {
+  var listEl = document.getElementById("today-cardio-list");
+  var infoEl = document.getElementById("today-cardio-info");
+  var totalEl = document.getElementById("today-cardio-total");
+
+  if (!listEl || !infoEl || !totalEl) return;
+
+  var arr = loadArray(STORAGE_KEYS.cardio);
+  var todays = arr.filter(function (c) {
+    return c.date === today;
+  });
+
+  listEl.innerHTML = "";
+
+  if (todays.length === 0) {
+    infoEl.textContent = "Aucune activité cardio saisie.";
+    totalEl.textContent = "";
+    return;
+  }
+
+  infoEl.textContent = "";
+  var totalMinutes = 0;
+
+  todays.forEach(function (c) {
+    totalMinutes += c.duration || 0;
+
+    var div = document.createElement("div");
+    div.className = "muted";
+    div.textContent =
+      (c.activity || "Activité") +
+      " – " +
+      c.duration +
+      " min" +
+      (c.intensity ? " (" + c.intensity + ")" : "");
+
+    listEl.appendChild(div);
+  });
+
+  totalEl.textContent = "Durée totale : " + totalMinutes + " min";
+}
 
 
 function getTodayDateString() {
