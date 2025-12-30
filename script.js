@@ -487,9 +487,20 @@ saveCaloriesBtn = newBtn;
   var openTodayWorkoutBtn = document.getElementById("open-today-workout-btn");
   var createFreeWorkoutBtn = document.getElementById("create-free-workout-btn");
 
+  // Évite les listeners doublons si initTodayTab() est rappelée
+var oldBtn = openTodayWorkoutBtn;
+var newBtn = oldBtn.cloneNode(true);
+oldBtn.parentNode.replaceChild(newBtn, oldBtn);
+openTodayWorkoutBtn = newBtn;
+
   openTodayWorkoutBtn.addEventListener("click", function () {
     openWorkoutModal(today, false);
   });
+
+var oldBtn2 = createFreeWorkoutBtn;
+var newBtn2 = oldBtn2.cloneNode(true);
+oldBtn2.parentNode.replaceChild(newBtn2, oldBtn2);
+createFreeWorkoutBtn = newBtn2;
 
   createFreeWorkoutBtn.addEventListener("click", function () {
     openWorkoutModal(today, true);
