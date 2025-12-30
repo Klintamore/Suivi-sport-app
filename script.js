@@ -380,6 +380,13 @@ var currentUnknownFood = null;
 
 /* ---------- Onglet Aujourd'hui ---------- */
 
+function loadMealText(meals, today, mealType, textarea) {
+  var m = meals.find(function (x) {
+    return x.date === today && x.mealType === mealType;
+  });
+  textarea.value = m ? m.text : "";
+}
+
 function initTodayTab() {
   var today = getTodayDateString();
   var weightInput = document.getElementById("today-weight-input");
@@ -425,17 +432,10 @@ function initTodayTab() {
   var dinnerInput = document.getElementById("meal-dinner");
   var snackInput = document.getElementById("meal-snack");
 
-  function loadMealText(mealType, textarea) {
-    var m = meals.find(function (x) {
-      return x.date === today && x.mealType === mealType;
-    });
-    textarea.value = m ? m.text : "";
-  }
-
-  loadMealText("petit-dejeuner", breakfastInput);
-  loadMealText("dejeuner", lunchInput);
-  loadMealText("diner", dinnerInput);
-  loadMealText("collation", snackInput);
+loadMealText(meals, today, "petit-dejeuner", breakfastInput);
+loadMealText(meals, today, "dejeuner", lunchInput);
+loadMealText(meals, today, "diner", dinnerInput);
+loadMealText(meals, today, "collation", snackInput);
 
   mealsBtns.forEach(function (btn) {
     btn.addEventListener("click", function () {
