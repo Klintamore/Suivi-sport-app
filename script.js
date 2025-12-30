@@ -505,6 +505,56 @@ createFreeWorkoutBtn = newBtn2;
   createFreeWorkoutBtn.addEventListener("click", function () {
     openWorkoutModal(today, true);
   });
+// ---------- Cardio du jour ----------
+var cardioActivity = document.getElementById("cardio-activity");
+var cardioIntensity = document.getElementById("cardio-intensity");
+var cardioDuration = document.getElementById("cardio-duration");
+var cardioTerrain = document.getElementById("cardio-terrain");
+var cardioElevation = document.getElementById("cardio-elevation");
+var cardioNotes = document.getElementById("cardio-notes");
+
+var cardioInfo = document.getElementById("today-cardio-info");
+var cardioListEl = document.getElementById("today-cardio-list");
+var cardioTotalEl = document.getElementById("today-cardio-total");
+
+var saveCardioBtn = document.getElementById("save-today-cardio-btn");
+if (saveCardioBtn) {
+  // évite listeners doublons si initTodayTab() est rappelée
+  var old = saveCardioBtn;
+  var neu = old.cloneNode(true);
+  old.parentNode.replaceChild(neu, old);
+  saveCardioBtn = neu;
+
+  saveCardioBtn.addEventListener("click", function () {
+    console.log("CLICK CARDIO OK");
+
+    var duration = parseInt(cardioDuration.value, 10);
+    if (isNaN(duration) || duration <= 0) {
+      alert("Merci de saisir une durée valide (minutes).");
+      return;
+    }
+
+    var entry = {
+      date: today,
+      activity: cardioActivity ? cardioActivity.value : null,
+      intensity: cardioIntensity ? cardioIntensity.value : null,
+      duration: duration,
+      terrain: cardioTerrain ? cardioTerrain.value : null,
+      elevation: cardioElevation && cardioElevation.value !== "" ? parseInt(cardioElevation.value, 10) : null,
+      notes: cardioNotes ? (cardioNotes.value || "").trim() : ""
+    };
+
+    var arr = loadArray(STORAGE_KEYS.cardio);
+    arr.push(entry);
+    saveArray(STORAGE_KEYS.cardio, arr);
+
+    if (typeof renderTodayCardio === "function") {
+      renderTodayCardio(today);
+    } else if (cardioInfo) {
+      cardioInfo.textContent = "Séance cardio ajoutée.";
+    }
+  });
+}
 
   // Rappels
   updateReminderBanner();
