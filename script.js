@@ -592,6 +592,9 @@ if (saveCardioBtn) {
 cardioDuration.value = "";
 if (cardioElevation) cardioElevation.value = "";
 if (cardioNotes) cardioNotes.value = "";
+if (cardioActivity) cardioActivity.selectedIndex = 0;
+if (cardioIntensity) cardioIntensity.selectedIndex = 0;
+if (cardioTerrain) cardioTerrain.selectedIndex = 0;
 
     if (typeof renderTodayCardio === "function") {
       renderTodayCardio(today);
