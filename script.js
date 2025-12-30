@@ -34,6 +34,15 @@ document.addEventListener("DOMContentLoaded", function () {
 
 /* ---------- Helpers généraux ---------- */
 
+// Empêche d'ajouter plusieurs fois le même listener sur le même élément
+function on(el, eventName, handler, key = "") {
+  if (!el) return;
+  const k = `__bound_${eventName}_${key}`;
+  if (el[k]) return;
+  el.addEventListener(eventName, handler);
+  el[k] = true;
+}
+
 function getBestWeightForCalories(today) {
   // 1) poids du jour si dispo, sinon profil, sinon null
   var weights = loadArray(STORAGE_KEYS.weights);
