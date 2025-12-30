@@ -20,6 +20,12 @@ let volumeChart = null;
 const bodyCharts = {};
 let weightFatChart = null;
 
+function onClick(id, handler) {
+  var el = document.getElementById(id);
+  if (!el) return; // évite crash si le HTML n’a pas encore l’élément
+  el.addEventListener("click", handler);
+}
+
 document.addEventListener("DOMContentLoaded", function () {
   initThemeAndPreferences();
   setupNavigation();
@@ -425,7 +431,7 @@ function initTodayTab() {
     updateTodayCaloriesInfo(null);
   }
 
-  autoCalcBtn.addEventListener("click", function () {
+  onClick("TON_ID_ICI", function () {
     foodCalcContext = {
       date: today,
       texts: {
